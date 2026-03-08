@@ -5,3 +5,5 @@ openai
 python-dotenv
 pypdf
 langchain-community
+langchain-tavily
+tavily

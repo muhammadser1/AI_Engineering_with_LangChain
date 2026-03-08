@@ -7,6 +7,17 @@ from langchain.tools import tool
 from langchain_core.messages import HumanMessage
 from langchain_openai import ChatOpenAI
 
+from pydantic import BaseModel
+from typing import List
+
+class Source(BaseModel):
+    title: str
+    url: str
+
+
+class AgentResponse(BaseModel):
+    # answer: str
+    sources: List[Source]
 
 def build_tavily_client() -> TavilyClient:
     """Create and return a Tavily client."""
@@ -34,10 +45,10 @@ def build_search_tool(tavily_client: TavilyClient):
 
 
 def build_llm() -> ChatOpenAI:
-    """Create and return the LLM."""
+    """Create and return the LLM (plain, so the agent can use tool calls)."""
     return ChatOpenAI(
         model="gpt-4o-mini",
-        temperature=0.8
+        temperature=0.8,
     )
 
 
@@ -48,7 +59,7 @@ def build_agent():
     llm = build_llm()
 
     tools = [search_tool]
-    return create_agent(model=llm, tools=tools)
+    return create_agent(model=llm, tools=tools,response_format=AgentResponse)
 
 
 def main() -> None:
