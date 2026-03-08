@@ -5,6 +5,8 @@ This script performs hierarchical summarization of a PDF document.
 """
 
 from dotenv import load_dotenv
+from langchain_community.chat_models import ChatOllama
+
 load_dotenv()
 
 from langchain_community.document_loaders import PyPDFLoader
@@ -18,8 +20,12 @@ MODEL_NAME = "gpt-4o-mini"
 
 
 def summarize_pdf(pdf_path: str, max_pages: int = 5) -> str:
-    llm = ChatOpenAI(model=MODEL_NAME, temperature=0.2)
-
+    # llm = ChatOpenAI(model=MODEL_NAME, temperature=0.2)
+    llm = ChatOllama(
+        model="gemma3:270m",
+        temperature=0,
+        num_predict=80
+    )
     page_summary_prompt = PromptTemplate.from_template(
         "Summarize this page in 3-5 bullet points:\n\n{text}"
     )

@@ -1,18 +1,23 @@
 from dotenv import load_dotenv
+from langchain_community.chat_models import ChatOllama
+
 load_dotenv()
 
 from langchain_core.prompts import PromptTemplate
 from langchain_openai import ChatOpenAI
 
 
-def generate_joke(topic: str) -> str:
+def generate_joke(topic: str, style: str) -> str:
     """
-    Generate a joke about a given topic using an LLM.
+    Generate a joke using multiple prompt variables.
 
     Parameters
     ----------
     topic : str
-        The topic of the joke (e.g., "cats", "dogs", "programmers").
+        The topic of the joke (e.g., "cats", "AI", "programmers").
+
+    style : str
+        The style of the joke (e.g., "dad joke", "sarcastic", "dark humor").
 
     Returns
     -------
@@ -21,31 +26,41 @@ def generate_joke(topic: str) -> str:
 
     Steps
     -----
-    1. Create a reusable prompt template.
+    1. Create a reusable prompt template with multiple variables.
     2. Initialize the LLM model.
-    3. Fill the prompt template with the provided topic.
+    3. Fill the template with real values.
     4. Send the prompt to the LLM.
     5. Return the generated response.
     """
 
-    # 1️⃣ Create a reusable prompt template
+    # 1. Create a prompt template with multiple variables
     prompt_template = PromptTemplate.from_template(
-        "Tell me a joke about {topic}"
+        "Create a {style} joke about {topic}.\n"
+        "Return EXACTLY two lines:\n"
+        "1) Question: ...\n"
+        "2) Answer: ...\n"
     )
 
-    # 2️⃣ Initialize the LLM
+    # 2. Initialize the LLM
     llm = ChatOpenAI(
         model="gpt-4o-mini",
-        temperature=0.8,  # higher temperature = more creative responses
+        temperature=0.8
     )
+    # llm = ChatOllama(
+    #     model="gemma3:270m",
+    #     temperature=0,
+    #     num_predict=80
+    # )
+    # 3. Fill the template with actual values
+    prompt = prompt_template.invoke({
+        "topic": topic,
+        "style": style,
+    })
 
-    # 3️⃣ Fill the template with the topic
-    prompt = prompt_template.invoke({"topic": topic})
-
-    # 4️⃣ Send the prompt to the LLM
+    # 4. Send prompt to the LLM
     response = llm.invoke(prompt)
 
-    # 5️⃣ Return the generated joke
+    # 5. Return the generated joke
     return response.content
 
 
@@ -56,8 +71,10 @@ if __name__ == "__main__":
     Calls the generate_joke function and prints the result.
     """
 
-    topic = "dogs"
-    joke = generate_joke(topic)
+    topic = "cat"
+    style = "dad joke"
+
+    joke = generate_joke(topic, style)
 
     print("\nGenerated Joke:\n")
     print(joke)
