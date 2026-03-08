@@ -1,4 +1,6 @@
 from dotenv import load_dotenv
+from langchain_community.chat_models import ChatOllama
+
 load_dotenv()
 
 from langchain_core.prompts import PromptTemplate
@@ -33,10 +35,10 @@ def generate_joke(topic: str, style: str) -> str:
 
     # 1. Create a prompt template with multiple variables
     prompt_template = PromptTemplate.from_template(
-        """
-        Create a {style} joke about {topic}.
-        Make it short and funny.
-        """
+        "Create a {style} joke about {topic}.\n"
+        "Return EXACTLY two lines:\n"
+        "1) Question: ...\n"
+        "2) Answer: ...\n"
     )
 
     # 2. Initialize the LLM
@@ -44,7 +46,11 @@ def generate_joke(topic: str, style: str) -> str:
         model="gpt-4o-mini",
         temperature=0.8
     )
-
+    # llm = ChatOllama(
+    #     model="gemma3:270m",
+    #     temperature=0,
+    #     num_predict=80
+    # )
     # 3. Fill the template with actual values
     prompt = prompt_template.invoke({
         "topic": topic,
@@ -65,7 +71,7 @@ if __name__ == "__main__":
     Calls the generate_joke function and prints the result.
     """
 
-    topic = "dog"
+    topic = "cat"
     style = "dad joke"
 
     joke = generate_joke(topic, style)
